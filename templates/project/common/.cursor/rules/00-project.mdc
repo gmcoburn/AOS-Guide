@@ -1,0 +1,8 @@
+---
+description: Project-wide rules shared with every AI agent
+alwaysApply: true
+---
+
+Follow AGENTS.md at the repository root. It is the single source of truth for commands,
+working rules and conventions in this project, shared with Claude Code and Codex.
+Put Cursor-only rules in additional files in this folder.

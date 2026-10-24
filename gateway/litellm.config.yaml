@@ -1,0 +1,26 @@
+# Model names on the left are what clients ask for. Add third-party providers the same way.
+# Values starting os.environ/ are read from .env, never committed.
+model_list:
+  - model_name: onprem-default
+    litellm_params:
+      model: anthropic/REPLACE_WITH_ONPREM_MODEL_ID
+      api_base: os.environ/ONPREM_ANTHROPIC_BASE_URL
+      api_key: os.environ/ONPREM_ANTHROPIC_API_KEY
+
+  # Example third-party entries (uncomment when an API key exists):
+  # - model_name: openai-api
+  #   litellm_params:
+  #     model: openai/REPLACE_WITH_MODEL_ID
+  #     api_key: os.environ/OPENAI_API_KEY
+  # - model_name: gemini-api
+  #   litellm_params:
+  #     model: gemini/REPLACE_WITH_MODEL_ID
+  #     api_key: os.environ/GEMINI_API_KEY
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  # Per-user/per-project virtual keys and budgets need a Postgres database_url.
+  # Add one when more than one person uses the gateway.
+
+litellm_settings:
+  drop_params: true

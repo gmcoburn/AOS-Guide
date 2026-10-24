@@ -1,0 +1,5 @@
+# Normalise line endings so Windows and Linux agents produce the same diffs.
+* text=auto eol=lf
+*.{ps1,psm1,cmd,bat} text eol=crlf
+*.sh text eol=lf
+*.{png,jpg,jpeg,gif,ico,pdf,zip,gz} binary

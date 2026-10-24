@@ -1,0 +1,22 @@
+trigger:
+  branches:
+    include: [main]
+
+# For Azure Repos, PR runs come from a Build Validation branch policy on main
+# (Project settings > Repositories > Policies), not from a pr: trigger.
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - checkout: self
+    fetchDepth: 0
+
+  - script: >
+      docker run --rm -v "$(Build.SourcesDirectory):/repo"
+      -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0=/repo
+      ghcr.io/gitleaks/gitleaks:v8.18.4 detect --source /repo --redact --no-banner
+    displayName: Secret scan
+
+  - script: ./scripts/check.sh
+    displayName: Lint and test

@@ -1,0 +1,36 @@
+// Hardened agent sandbox. Works with Cursor and VS Code ("Reopen in Container").
+// Agents (Claude Code, Codex) run in here, never directly on the Windows host.
+{
+  "name": "{{PROJECT_NAME}}",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "remoteUser": "vscode",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": { "version": "lts" },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
+  },
+  "runArgs": [
+    "--cap-drop=ALL",
+    "--security-opt=no-new-privileges:true",
+    "--pids-limit=1024",
+    "--memory=8g"
+  ],
+  // Tool logins persist per project in named volumes, not in the repo or on the host.
+  "mounts": [
+    "source={{PROJECT_SLUG}}-claude,target=/home/vscode/.claude,type=volume",
+    "source={{PROJECT_SLUG}}-codex,target=/home/vscode/.codex,type=volume"
+  ],
+  // On-prem AI settings come from the host environment so nothing internal is committed.
+  "containerEnv": {
+    "AOS_ONPREM_URL": "${localEnv:AOS_ONPREM_URL}",
+    "AOS_ONPREM_TOKEN": "${localEnv:AOS_ONPREM_TOKEN}",
+    "AOS_ONPREM_MODEL": "${localEnv:AOS_ONPREM_MODEL}"
+  },
+  "postCreateCommand": "npm install -g @openai/codex",
+  "customizations": {
+    "vscode": {
+      "extensions": ["editorconfig.editorconfig"]
+    }
+  }
+}

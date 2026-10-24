@@ -1,0 +1,20 @@
+# Phase 2 model gateway (LiteLLM) for an Ubuntu Docker host.
+# Fronts the on-prem Anthropic-compatible service and any pay-per-use third-party APIs.
+# Subscriptions (Claude, ChatGPT, Cursor) do NOT go through here; see docs/HANDOFF.md C17.
+services:
+  litellm:
+    # Pin to a specific release tag before use; check the LiteLLM releases page.
+    image: ghcr.io/berriai/litellm:main-stable
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    env_file: .env
+    volumes:
+      - ./litellm.config.yaml:/app/config.yaml:ro
+    # Docker bypasses ufw for published ports. Bind to one internal address only
+    # (default loopback) and put TLS in front, e.g. the server's existing reverse proxy.
+    ports:
+      - "${GATEWAY_BIND:-127.0.0.1}:4000:4000"
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 512
+    mem_limit: 2g
+    restart: unless-stopped

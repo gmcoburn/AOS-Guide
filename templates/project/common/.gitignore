@@ -1,0 +1,27 @@
+# Secrets
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+
+# Personal tool settings
+.claude/settings.local.json
+.vscode/*
+!.vscode/extensions.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Common build output (extend per stack)
+node_modules/
+dist/
+build/
+bin/Debug/
+obj/
+__pycache__/
+.venv/
+.pytest_cache/
+coverage/
