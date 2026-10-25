@@ -3,7 +3,7 @@
 // Agents (Claude Code, Codex) run in here, never directly on the workstation or server.
 {
   "name": "{{PROJECT_NAME}}",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "build": { "dockerfile": "Dockerfile" },
   "remoteUser": "vscode",
   "features": {
     "ghcr.io/devcontainers/features/node:1": { "version": "lts" },
@@ -21,8 +21,13 @@
     "--network=aos-agents"
     // Phase 3, if gVisor is installed on the host: "--runtime=runsc"
   ],
-  // Tool logins persist per user and project in named volumes, not in the repo.
+  // Runs on the server before the container starts: makes sure the personal rules file
+  // exists, because a bind mount of a missing path fails.
+  "initializeCommand": "mkdir -p \"$HOME/.config/aos/agents\" && touch \"$HOME/.config/aos/agents/AGENTS.md\"",
+  // Tool logins and session history persist per user and project in named volumes.
+  // Personal rules (shared by every project) are mounted read-only from the server.
   "mounts": [
+    "source=${localEnv:HOME}/.config/aos/agents,target=/home/vscode/.aos,type=bind,readonly",
     "source=${localEnv:USER}-{{PROJECT_SLUG}}-claude,target=/home/vscode/.claude,type=volume",
     "source=${localEnv:USER}-{{PROJECT_SLUG}}-codex,target=/home/vscode/.codex,type=volume"
   ],

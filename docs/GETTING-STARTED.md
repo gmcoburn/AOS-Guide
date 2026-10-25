@@ -19,6 +19,8 @@ Imagine you are building things with a team of very fast, very clever helpers.
 | **The on-prem AI** | A helper who **lives in our building**, so nothing leaves the building. |
 | **`AGENTS.md`** | The **rules sheet on the fridge**. Every helper reads it before starting. |
 | **`./scripts/check.sh`** | The **"is it working?" button**. Everyone presses the same button. |
+| **Your personal `AGENTS.md`** | **Your own name badge** that every helper reads in every project: how you like things done. |
+| **Plans and Learnings** | The **notebook** on the workbench. Helpers write down what they're doing and what they learned, so tomorrow's helper can pick up where today's left off. |
 | **Git** | **Save points** in a video game. You can always go back. |
 | **GitHub / Azure DevOps** | The **safe** where the finished work is kept. Azure DevOps for work projects, GitHub for personal ones. |
 | **A pull request (PR)** | **Showing your work to the teacher** before it goes in the safe. You are the teacher. |
@@ -127,6 +129,13 @@ git config --global credential.azreposCredentialType oauth
 
 The first push to Azure DevOps will show a code to type into a browser, like `az login`.
 
+**Step 6b. Tell git who you are** (your name goes on every save point).
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com.au"
+```
+
 **Step 7. Make the project-maker load automatically.**
 
 ```bash
@@ -166,6 +175,21 @@ Now `ssh devbox` just works.
 That's the building done.
 
 ---
+
+**Step 8. Write your name badge** (your personal rules). Copy the starting version and
+edit it:
+
+```bash
+mkdir -p ~/.config/aos/agents
+cp -n ~/AOS-Guide/templates/personal/AGENTS.md ~/.config/aos/agents/AGENTS.md
+nano ~/.config/aos/agents/AGENTS.md
+```
+
+Every helper in every project reads this. Change it any time; it takes effect straight
+away. (If you skip this, the first new project creates it for you.)
+
+On your PC, paste the same text into **Cursor > Settings > Rules > User Rules**, because
+Cursor keeps its own copy.
 
 ## Part 3: Starting a new project (a few minutes each time)
 
@@ -248,7 +272,8 @@ git switch -c feature/short-name
 
 **2. Plan first.** Ask Claude (or Codex, or the on-prem AI):
 
-> Write a plan for <the thing you want> in docs/plans/. Don't write any code yet.
+> Write a plan for <the thing you want>, using docs/plans/_template.md. Don't write any
+> code yet.
 
 Read the plan. Change anything you don't like. Small jobs can skip this step.
 
@@ -284,13 +309,39 @@ git push -u origin feature/short-name
 
 (Or just ask Claude: "commit and push this".)
 
+**Stopping for the day?** Before you close Cursor, tell the helper:
+
+> Update the plan's Progress and Next step, and add anything we learned to Learnings
+> in AGENTS.md.
+
+Tomorrow, any helper can start with: "Read the plan in docs/plans/<file> and carry on
+from Next step." To pick up the exact same conversation instead, run `claude --continue`
+(or `codex resume`).
+
 **7. Share and merge.** Open a pull request in Azure DevOps or GitHub. The template asks
 which AI tools helped. CI presses the "is it working?" button again. You read it,
 you approve it, you merge it. Done.
 
 ---
 
-## Part 5: Which helper for which job?
+## Part 5: How the helpers remember things
+
+Helpers forget everything when a chat ends, and they don't share chats with each other.
+So the memory lives in files that every helper reads:
+
+| Memory | Where | Who updates it |
+|---|---|---|
+| **Your name badge** (how you like things done, in every project) | `~/.config/aos/agents/AGENTS.md` on the server | You |
+| **The project rules** | `AGENTS.md` in the project | You and the helpers (via PRs) |
+| **Lessons learned** in this project | The **Learnings** section at the bottom of `AGENTS.md` | Helpers add a line when they discover something; you approve it in the PR |
+| **What we're doing and how far we got** | `docs/plans/` | Helpers tick off Progress and write Next step |
+| **Why we did things** | `docs/decisions/` | Helpers or you, for big decisions |
+| **Yesterday's chat** | Inside each helper (`claude --continue`, `codex resume`) | Automatic, but only that helper can see it |
+
+If you notice yourself telling helpers the same thing twice: if it's about you, add it
+to your name badge; if it's about the project, add it to `AGENTS.md`.
+
+## Part 6: Which helper for which job?
 
 | I want to... | Use |
 |---|---|
@@ -302,7 +353,7 @@ you approve it, you merge it. Done.
 
 ---
 
-## Part 6: Golden rules
+## Part 7: Golden rules
 
 1. **Never let a helper work outside its playpen.** Always "Reopen in Container".
 2. **Never put passwords or keys in the project.** They go in `.env` (which git ignores)
@@ -317,7 +368,7 @@ you approve it, you merge it. Done.
 
 ---
 
-## Part 7: When things go wrong
+## Part 8: When things go wrong
 
 | Problem | Try this |
 |---|---|
@@ -328,6 +379,8 @@ you approve it, you merge it. Done.
 | `New-AgenticProject` isn't found | Run `pwsh` first, or redo Part 2.1 step 7. |
 | Pushing from inside the playpen asks for a password | On Windows, push once to that site from any folder so Git Credential Manager remembers you, then reconnect Cursor. |
 | Pushing from the server (outside the playpen) asks for a password | GitHub: `gh auth login` then `gh auth setup-git`. Azure DevOps: set up Git Credential Manager (Part 2.1 step 6). |
+| Helpers ignore my personal rules | Check `~/.config/aos/agents/AGENTS.md` exists on the server. For projects created before 25/10/2026, remove the old tool volumes once (`docker volume ls`, then `docker volume rm` the two for that project) and rebuild the container; you will need to log in to the helpers again. |
+| A new project stops with `Program "git" ended with non-zero exit code` | Usually git doesn't know who you are yet. Do Part 2.1 step 6b, delete the half-made folder, and run it again. |
 | Everything is confusing | Ask Claude, inside the project: "Read AGENTS.md and docs/, then explain how to <thing>". |
 
 ---

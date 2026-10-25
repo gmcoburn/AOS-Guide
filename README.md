@@ -19,6 +19,7 @@ earlier draft, open questions, and a review brief for another AI.
 | `templates/project/common` | Files every project gets |
 | `templates/project/github` | Extra files for GitHub projects |
 | `templates/project/azure-devops` | Extra files for Azure DevOps projects |
+| `templates/personal/AGENTS.md` | Starting point for your personal rules (shared by every project) |
 | `bin/New-AgenticProject.ps1` | Create a project from the template |
 | `bin/AgenticOS.psm1` | PowerShell helpers (`New-AgenticProject`, `claude-onprem`) |
 | `gateway/` | Optional LiteLLM gateway for the on-prem and third-party APIs |

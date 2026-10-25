@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+#Requires -Version 7.3
 <#
 .SYNOPSIS
     Creates a new project from templates/project, for GitHub or Azure DevOps.
@@ -29,6 +29,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+# Make failing git/gh/az commands stop the script instead of carrying on.
+$PSNativeCommandUseErrorActionPreference = $true
 
 $templateRoot = Join-Path $PSScriptRoot '..' 'templates' 'project'
 $platformDir = @{ GitHub = 'github'; AzureDevOps = 'azure-devops' }[$Platform]
@@ -58,6 +60,14 @@ Get-ChildItem -Path $target -Recurse -File -Force | ForEach-Object {
     if ($null -eq $text -or $text -notmatch '\{\{[A-Z_]+\}\}') { return }
     foreach ($key in $tokens.Keys) { $text = $text.Replace($key, $tokens[$key]) }
     Set-Content -Path $_.FullName -Value $text -NoNewline
+}
+
+# Personal rules shared by every project: created once from the template, then yours to edit.
+$personalRules = Join-Path $HOME '.config' 'aos' 'agents' 'AGENTS.md'
+if (-not (Test-Path $personalRules)) {
+    New-Item -ItemType Directory -Force -Path (Split-Path $personalRules) | Out-Null
+    Copy-Item -Path (Join-Path $PSScriptRoot '..' 'templates' 'personal' 'AGENTS.md') -Destination $personalRules
+    Write-Host "Created your personal rules file: $personalRules (edit it to suit you)."
 }
 
 Push-Location $target

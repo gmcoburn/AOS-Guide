@@ -59,6 +59,10 @@ export AOS_ADO_ORG_URL=https://<org>.visualstudio.com
 export AOS_ADO_PROJECT='Systems Team'
 ```
 
+Personal rules for every project live in `~/.config/aos/agents/AGENTS.md` (created from
+`templates/personal/AGENTS.md` by the first `New-AgenticProject` run). Dev containers
+mount that folder read-only, so keep only that file in it: no keys or other secrets.
+
 If the on-prem service uses a certificate from an internal CA, the container needs that
 CA: add it to the image or set `NODE_EXTRA_CA_CERTS` to a mounted copy.
 

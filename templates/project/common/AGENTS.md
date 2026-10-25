@@ -31,10 +31,19 @@ Cursor, OpenAI Codex, and any other tool that reads AGENTS.md). Humans: see READ
 
 ## Shared memory between tools
 
-- Plans: write to `docs/plans/YYYY-MM-DD-<topic>.md` before large changes, so another
-  tool or a human can review or continue them.
+The tools do not share chat history. Files in this repo are the shared memory.
+
+- Plans: before large changes, copy `docs/plans/_template.md` to
+  `docs/plans/YYYY-MM-DD-<topic>.md` and fill it in.
+- Progress: while working on a plan, tick off its Progress checklist and update its
+  "Next step" line as you go, and always before ending a session. Another tool or a
+  human must be able to continue from the plan file alone.
 - Decisions: record significant ones as ADRs in `docs/decisions/` (see 0001).
 - Architecture overview: keep `docs/architecture.md` current when structure changes.
+- Learnings: when you discover something non-obvious about this project (a gotcha, a
+  required order of steps, a command that must be run first), add a one-line entry to
+  the Learnings section below in the same change. Keep entries short and factual; remove
+  ones that stop being true.
 
 ## Conventions
 
@@ -42,3 +51,7 @@ Cursor, OpenAI Codex, and any other tool that reads AGENTS.md). Humans: see READ
   Australian English spelling.
 - Commit messages: imperative mood, short subject, body explains why. Note which
   AI tool assisted in the PR description.
+
+## Learnings
+
+<!-- One line each, newest last. Format: DD/MM/YYYY: what we learned. -->
