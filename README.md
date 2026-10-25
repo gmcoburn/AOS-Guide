@@ -5,7 +5,10 @@ using Claude Code, Cursor, OpenAI Codex, an on-prem Anthropic-compatible AI serv
 third-party AI APIs together on the same codebase, with projects hosted on GitHub or
 Azure DevOps.
 
-Start with [docs/HANDOFF.md](docs/HANDOFF.md): the design, decisions, corrections to the
+New here? Read [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md): a plain-English guide to
+setting it up and the everyday workflow.
+
+For the full design, see [docs/HANDOFF.md](docs/HANDOFF.md): the design, decisions, corrections to the
 earlier draft, open questions, and a review brief for another AI.
 
 ## Layout
