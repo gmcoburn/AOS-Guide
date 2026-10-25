@@ -19,19 +19,21 @@ earlier draft, open questions, and a review brief for another AI.
 | `bin/New-AgenticProject.ps1` | Create a project from the template |
 | `bin/AgenticOS.psm1` | PowerShell helpers (`New-AgenticProject`, `claude-onprem`) |
 | `gateway/` | Optional LiteLLM gateway for the on-prem and third-party APIs |
+| `server/` | Ubuntu Docker host setup and the agent egress firewall |
 
 ## Create a project
 
-From PowerShell 7 in WSL2 (keeps code on the fast Linux filesystem):
+From PowerShell 7 (`pwsh`) on the Ubuntu dev server, where the dev containers run:
 
 ```powershell
 Import-Module ~/src/AOS-Guide/bin/AgenticOS.psm1
 New-AgenticProject -Name my-tool -Platform GitHub -Path ~/src -CreateRemote
-New-AgenticProject -Name my-svc -Platform AzureDevOps -Path ~/src -CreateRemote `
-    -AdoOrganization <org> -AdoProject <project>
+# Company work: org URL and project come from $env:AOS_ADO_ORG_URL / $env:AOS_ADO_PROJECT
+New-AgenticProject -Name my-svc -Platform AzureDevOps -Path ~/src -CreateRemote
 ```
 
-Then open the folder in Cursor and choose **Reopen in Container**.
+Then in Cursor on Windows: Remote-SSH to the server, open the folder, and choose
+**Reopen in Container**. The server needs the one-off setup in [server/README.md](server/README.md).
 
 ## Public repo rule
 

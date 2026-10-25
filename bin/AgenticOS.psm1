@@ -3,7 +3,7 @@
 # Tokens are read from Microsoft.PowerShell.SecretManagement, never from files in a repo:
 #   Install-Module Microsoft.PowerShell.SecretManagement, Microsoft.PowerShell.SecretStore
 #   Register-SecretVault -Name aos -ModuleName Microsoft.PowerShell.SecretStore
-#   Set-Secret -Vault aos -Name AOS_ONPREM_TOKEN
+#   Set-Secret -Vault aos -Name AOS_ONPREM_API_KEY
 
 Set-Alias -Name New-AgenticProject -Value (Join-Path $PSScriptRoot 'New-AgenticProject.ps1')
 
@@ -12,17 +12,18 @@ Set-Alias -Name New-AgenticProject -Value (Join-Path $PSScriptRoot 'New-AgenticP
 # AOS_ONPREM_MODEL are not secret; set them in your profile.
 function Enable-AosOnPrem {
     if (-not $env:AOS_ONPREM_URL) { throw 'Set $env:AOS_ONPREM_URL in your profile first.' }
-    $env:AOS_ONPREM_TOKEN = Get-Secret -Vault aos -Name AOS_ONPREM_TOKEN -AsPlainText
+    $env:AOS_ONPREM_API_KEY = Get-Secret -Vault aos -Name AOS_ONPREM_API_KEY -AsPlainText
 }
 
-# Runs Claude Code on the host against the on-prem service. Prefer running agents in
-# the dev container (scripts/claude-onprem.sh); this is for quick questions only.
+# Runs Claude Code outside a container against the on-prem service. Prefer running
+# agents in the dev container (scripts/claude-onprem.sh); this is for quick questions.
 function Start-ClaudeOnPrem {
     Enable-AosOnPrem
     $saved = @{}
     $vars = @{
         ANTHROPIC_BASE_URL                      = $env:AOS_ONPREM_URL
-        ANTHROPIC_AUTH_TOKEN                    = $env:AOS_ONPREM_TOKEN
+        ANTHROPIC_API_KEY                       = $env:AOS_ONPREM_API_KEY
+        ANTHROPIC_AUTH_TOKEN                    = $null
         CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = '1'
     }
     if ($env:AOS_ONPREM_MODEL) { $vars.ANTHROPIC_MODEL = $env:AOS_ONPREM_MODEL }

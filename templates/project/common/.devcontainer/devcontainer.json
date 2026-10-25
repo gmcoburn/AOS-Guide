@@ -1,5 +1,6 @@
 // Hardened agent sandbox. Works with Cursor and VS Code ("Reopen in Container").
-// Agents (Claude Code, Codex) run in here, never directly on the Windows host.
+// Runs on an Ubuntu Docker host: Cursor Remote-SSH to the server, then Reopen in Container.
+// Agents (Claude Code, Codex) run in here, never directly on the workstation or server.
 {
   "name": "{{PROJECT_NAME}}",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
@@ -14,17 +15,22 @@
     "--cap-drop=ALL",
     "--security-opt=no-new-privileges:true",
     "--pids-limit=1024",
-    "--memory=8g"
+    "--memory=8g",
+    // Internet allowed, internal network blocked except allow-listed hosts.
+    // Created by server/aos-egress.sh on the Docker host.
+    "--network=aos-agents"
+    // Phase 3, if gVisor is installed on the host: "--runtime=runsc"
   ],
-  // Tool logins persist per project in named volumes, not in the repo or on the host.
+  // Tool logins persist per user and project in named volumes, not in the repo.
   "mounts": [
-    "source={{PROJECT_SLUG}}-claude,target=/home/vscode/.claude,type=volume",
-    "source={{PROJECT_SLUG}}-codex,target=/home/vscode/.codex,type=volume"
+    "source=${localEnv:USER}-{{PROJECT_SLUG}}-claude,target=/home/vscode/.claude,type=volume",
+    "source=${localEnv:USER}-{{PROJECT_SLUG}}-codex,target=/home/vscode/.codex,type=volume"
   ],
-  // On-prem AI settings come from the host environment so nothing internal is committed.
+  // On-prem AI settings come from the server user's environment (~/.profile) so nothing
+  // internal is committed.
   "containerEnv": {
     "AOS_ONPREM_URL": "${localEnv:AOS_ONPREM_URL}",
-    "AOS_ONPREM_TOKEN": "${localEnv:AOS_ONPREM_TOKEN}",
+    "AOS_ONPREM_API_KEY": "${localEnv:AOS_ONPREM_API_KEY}",
     "AOS_ONPREM_MODEL": "${localEnv:AOS_ONPREM_MODEL}"
   },
   "postCreateCommand": "npm install -g @openai/codex",

@@ -1,0 +1,16 @@
+# Re-applies the agent egress rules at boot and whenever Docker restarts.
+# Install: cp aos-egress.sh /usr/local/sbin/ && cp aos-egress.service /etc/systemd/system/
+#          systemctl daemon-reload && systemctl enable --now aos-egress
+[Unit]
+Description=Agentic OS container egress rules
+After=docker.service
+Requires=docker.service
+PartOf=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/aos-egress.sh
+
+[Install]
+WantedBy=docker.service

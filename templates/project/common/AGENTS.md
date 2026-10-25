@@ -8,9 +8,8 @@ Cursor, OpenAI Codex, and any other tool that reads AGENTS.md). Humans: see READ
 - Purpose: TODO one or two sentences.
 - Stack: TODO language, framework, runtime versions.
 - Repo platform: {{PLATFORM}}
-- Data classification: TODO Public | Internal | Confidential
-  - Confidential projects may only be worked on with the on-prem model (`./scripts/claude-onprem.sh`)
-    unless an exception is recorded in docs/decisions/.
+- Personal information: never put real customer or staff records in prompts, fixtures or
+  tests. Use synthetic or masked data (Privacy Act 1988).
 
 ## Commands
 

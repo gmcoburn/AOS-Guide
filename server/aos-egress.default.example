@@ -1,0 +1,5 @@
+# Copy to /etc/default/aos-egress on the Docker host. Not committed with real values.
+AOS_AGENT_NETWORK=aos-agents
+AOS_AGENT_SUBNET=172.30.0.0/16
+# Internal host:port pairs agent containers may reach (on-prem AI, gateway).
+AOS_INTERNAL_ALLOW="10.0.0.10:443"

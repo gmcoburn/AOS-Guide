@@ -7,13 +7,13 @@
     ./New-AgenticProject.ps1 -Name invoice-tool -Platform GitHub -Path ~/src -CreateRemote
 
 .EXAMPLE
-    ./New-AgenticProject.ps1 -Name route-planner -Platform AzureDevOps -Path ~/src `
-        -CreateRemote -AdoOrganization contoso -AdoProject Engineering
+    ./New-AgenticProject.ps1 -Name route-planner -Platform AzureDevOps -Path ~/src -CreateRemote
+    # Org URL and project default to $env:AOS_ADO_ORG_URL and $env:AOS_ADO_PROJECT.
+    # Pass -AdoOrganizationUrl https://<org>.visualstudio.com -AdoProject 'Systems Team' to override.
 
 .NOTES
-    Run from WSL2 (pwsh) so the project lands on the Linux filesystem, which is much
-    faster for containers than C:\. Remote creation needs `gh` (GitHub) or `az` with the
-    azure-devops extension (Azure DevOps), already signed in.
+    Run with pwsh on the Ubuntu dev server, where the dev containers run. Remote creation
+    needs `gh` (GitHub) or `az` with the azure-devops extension (Azure DevOps), signed in.
 #>
 [CmdletBinding(SupportsShouldProcess)]
 param(
@@ -23,8 +23,9 @@ param(
     [switch]$CreateRemote,
     [string]$GitHubOwner,
     [ValidateSet('private', 'internal', 'public')][string]$Visibility = 'private',
-    [string]$AdoOrganization,
-    [string]$AdoProject
+    # Full organisation URL; works for dev.azure.com/<org> and legacy <org>.visualstudio.com.
+    [string]$AdoOrganizationUrl = $env:AOS_ADO_ORG_URL,
+    [string]$AdoProject = $env:AOS_ADO_PROJECT
 )
 
 $ErrorActionPreference = 'Stop'
@@ -34,8 +35,8 @@ $platformDir = @{ GitHub = 'github'; AzureDevOps = 'azure-devops' }[$Platform]
 $target = Join-Path $Path $Name
 
 if (Test-Path $target) { throw "Target already exists: $target" }
-if ($CreateRemote -and $Platform -eq 'AzureDevOps' -and (-not $AdoOrganization -or -not $AdoProject)) {
-    throw 'Azure DevOps remote needs -AdoOrganization and -AdoProject.'
+if ($CreateRemote -and $Platform -eq 'AzureDevOps' -and (-not $AdoOrganizationUrl -or -not $AdoProject)) {
+    throw 'Azure DevOps remote needs -AdoOrganizationUrl and -AdoProject (or $env:AOS_ADO_ORG_URL and $env:AOS_ADO_PROJECT).'
 }
 
 if (-not $PSCmdlet.ShouldProcess($target, "Create $Platform project")) { return }
@@ -77,8 +78,7 @@ try {
                 gh repo create $repo "--$Visibility" --source . --remote origin --push
             }
             'AzureDevOps' {
-                $orgUrl = "https://dev.azure.com/$AdoOrganization"
-                $remoteUrl = az repos create --name $Name --org $orgUrl --project $AdoProject --query remoteUrl -o tsv
+                $remoteUrl = az repos create --name $Name --org $AdoOrganizationUrl --project $AdoProject --query remoteUrl -o tsv
                 if (-not $remoteUrl) { throw 'az repos create returned no remote URL.' }
                 git remote add origin $remoteUrl
                 git push -u origin main
@@ -91,4 +91,4 @@ finally {
     Pop-Location
 }
 
-Write-Host "Created $target ($Platform). Open it in Cursor and choose 'Reopen in Container'."
+Write-Host "Created $target ($Platform). In Cursor: Remote-SSH to this server, open the folder, 'Reopen in Container'."
